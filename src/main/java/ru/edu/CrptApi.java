@@ -18,7 +18,7 @@ public class CrptApi {
     private final Semaphore semaphore;
     private final ScheduledExecutorService scheduler;
     private final ObjectMapper objectMapper;
-    private String apiUrl = "http://localhost:8080/";
+    private String apiUrl = "https://ismp.crpt.ru/api/v3/lk/documents/create";
     private final String authToken;
 
     public CrptApi(TimeUnit timeUnit, int requestLimit, String authToken) {
@@ -49,8 +49,7 @@ public class CrptApi {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
-            // Асинхронный запрос
-            System.out.println("перед отправкой");
+
             return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .whenComplete((response, throwable) -> semaphore.release());
         } catch (IOException e) {
@@ -101,7 +100,6 @@ public class CrptApi {
             CompletableFuture<HttpResponse<String>> responseFuture = api.createDocument(document, "signature");
             responseFuture.thenAccept(response -> {
                 System.out.println("Response: " + response.body());
-
             }).exceptionally(ex -> {
                 ex.printStackTrace();
                 return null;
